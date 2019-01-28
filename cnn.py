@@ -10,8 +10,7 @@ from keras.optimizers import Adam
 from keras.optimizers import SGD
 
 np.random.seed(2)
-width = 100
-height = 100
+
 train_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory('/home/yu/img3/train',target_size=(100,100),batch_size=2,class_mode='categorical')
@@ -37,7 +36,7 @@ model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.25))
 model.add(Flatten())
 
-#Flatten : 완전연결계층과 연결하기 위해, 3차원 데이터를 1차원으로
+
 model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(2, activation='softmax'))
