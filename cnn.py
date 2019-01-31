@@ -8,20 +8,19 @@ from keras.layers.convolutional import MaxPooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
 from keras.optimizers import SGD
-
+from keras.models import load_model
 np.random.seed(2)
-
 train_datagen = ImageDataGenerator(rescale=1./255)
 
-train_generator = train_datagen.flow_from_directory('/home/yu/img3/train',target_size=(100,100),batch_size=2,class_mode='categorical')
+train_generator = train_datagen.flow_from_directory('/home/yu/img3/train',target_size=(100,100),batch_size=50,class_mode='categorical')
 
 validation_datagen = ImageDataGenerator(rescale=1./255)
 
-validation_generator = validation_datagen.flow_from_directory('/home/yu/img3/validation', target_size = (100,100),batch_size=2,class_mode='categorical')
+validation_generator = validation_datagen.flow_from_directory('/home/yu/img3/validation', target_size = (100,100),batch_size=50,class_mode='categorical')
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-test_generator = test_datagen.flow_from_directory('/home/yu/img3/test',target_size=(100,100),batch_size=2,class_mode='categorical')
+test_generator = test_datagen.flow_from_directory('/home/yu/img3/test',target_size=(100,100),batch_size=50,class_mode='categorical')
 
 
 model = Sequential()
@@ -36,32 +35,33 @@ model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.25))
 model.add(Flatten())
 
-
 model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(2, activation='softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.001), metrics=['accuracy'])
 
-model.fit_generator(train_generator,steps_per_epoch=500,epochs=50,validation_data=validation_generator,validation_steps=250)
+model.fit_generator(train_generator,steps_per_epoch=20,epochs=50,validation_data=validation_generator,validation_steps=10)
 
 print("--ValEvaluate--")
-scores = model.evaluate_generator(validation_generator,steps=5)
+scores = model.evaluate_generator(validation_generator,steps=20)
 print("%s: %.2f%%" %(model.metrics_names[1], scores[1]*100))
 
-print("-- ValPredict --")
-output = model.predict_generator(validation_generator, steps=5)
+print("--ValPredict--")
+output = model.predict_generator(validation_generator, steps=20)
 np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
 print(validation_generator.class_indices)
 print(output)
+#print(validation_generator.filenames)
 
 print("--Evaluate--")
-scores = model.evaluate_generator(test_generator,steps=5)
+scores = model.evaluate_generator(test_generator,steps=20)
 print("%s: %.2f%%" %(model.metrics_names[1], scores[1]*100))
 
-print("-- Predict --")
-output2 = model.predict_generator(test_generator, steps=5)
+print("--Predict--")
+output2 = model.predict_generator(test_generator, steps=20)
 np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
 print(test_generator.class_indices)
 print(output2)
 #print(test_generator.filenames)
+#model.save('cnn.h5')
